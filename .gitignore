@@ -1,0 +1,20 @@
+# Build intermediate
+/gen/
+
+# Build output
+/out/
+/build/
+/target/
+
+# downloaded libs/resources
+/lib/
+
+.gradle/
+
+*.pyc
+bilder.py
+*.iml
+
+# Per-user settings
+# https://intellij-support.jetbrains.com/entries/23393067
+.idea/
