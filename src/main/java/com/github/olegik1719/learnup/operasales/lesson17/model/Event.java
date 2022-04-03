@@ -1,32 +1,21 @@
 package com.github.olegik1719.learnup.operasales.lesson17.model;
 
+import lombok.*;
+import lombok.experimental.Accessors;
+
 import java.util.Date;
 
+@Accessors(chain = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, doNotUseGetters = true)
+@ToString
 public class Event {
-    private Date dateEvent;
-    private Opera operaEvent;
+    @EqualsAndHashCode.Include
+    private Date date;
+    @EqualsAndHashCode.Include
+    private Opera opera;
+    private int countSold;
 
-    public Event(Date dateEvent, Opera operaEvent) {
-        this.dateEvent = dateEvent;
-        this.operaEvent = operaEvent;
-    }
-
-    public Event() {
-    }
-
-    public Date getDateEvent() {
-        return dateEvent;
-    }
-
-    public void setDateEvent(Date dateEvent) {
-        this.dateEvent = dateEvent;
-    }
-
-    public Opera getOperaEvent() {
-        return operaEvent;
-    }
-
-    public void setOperaEvent(Opera operaEvent) {
-        this.operaEvent = operaEvent;
-    }
 }

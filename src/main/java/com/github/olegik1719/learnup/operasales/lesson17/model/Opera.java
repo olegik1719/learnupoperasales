@@ -1,40 +1,31 @@
 package com.github.olegik1719.learnup.operasales.lesson17.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+@Accessors(chain = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, doNotUseGetters = true)
+@Getter
+@Setter
+@ToString
 public class Opera {
+
+    @EqualsAndHashCode.Include
     private String name;
+    @EqualsAndHashCode.Include
     private String author;
     private String description;
+    private Category category;
+    private int fullCapacity;
 
-    public Opera() {
-    }
-
-    public Opera(String name, String author, String description) {
-        this.name = name;
-        this.author = author;
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
+    public enum Category {
+        NO_LIMITS,
+        OVER_03,
+        OVER_06,
+        OVER_16,
+        OVER_18
     }
 }
