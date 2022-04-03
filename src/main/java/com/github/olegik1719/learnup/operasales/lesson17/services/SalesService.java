@@ -23,7 +23,7 @@ public interface SalesService {
 
     boolean removeEvent(Opera opera, Date date);
 
-    int buyTicket(Opera opera, Date date);
+    Integer buyTicket(Opera opera, Date date);
 
     boolean refundTicket(int id);
 }

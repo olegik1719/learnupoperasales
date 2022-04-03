@@ -66,7 +66,7 @@ public class SimpleSalesService implements SalesService {
     }
 
     @Override
-    public int buyTicket(Opera opera, Date date) {
+    public Integer buyTicket(Opera opera, Date date) {
         Event event = eventRepo.getEvent(opera,date);
         return ticketRepo.buyTicket(event).getId();
     }
