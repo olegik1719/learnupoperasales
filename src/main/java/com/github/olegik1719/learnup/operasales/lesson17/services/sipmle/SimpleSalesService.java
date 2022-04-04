@@ -1,5 +1,6 @@
 package com.github.olegik1719.learnup.operasales.lesson17.services.sipmle;
 
+import com.github.olegik1719.learnup.operasales.lesson17.annotations.Notifiable;
 import com.github.olegik1719.learnup.operasales.lesson17.model.Event;
 import com.github.olegik1719.learnup.operasales.lesson17.model.Opera;
 import com.github.olegik1719.learnup.operasales.lesson17.model.Ticket;
@@ -32,7 +33,8 @@ public class SimpleSalesService implements SalesService {
     }
 
     @Override
-    public boolean modifyOpera(String oldName, String oldAuthor, String newName, String newAuthor, String newDescription, Opera.Category newCategory, int capacity) {
+    @Notifiable
+    public Boolean modifyOpera(String oldName, String oldAuthor, String newName, String newAuthor, String newDescription, Opera.Category newCategory, int capacity) {
         Opera oldOpera = operaRepo.findByNameAuthor(oldName, oldAuthor);
         if (oldOpera == null) {
             return false;
@@ -54,13 +56,15 @@ public class SimpleSalesService implements SalesService {
     }
 
     @Override
-    public boolean addEvent(Opera opera, Date date) {
+    @Notifiable
+    public Boolean addEvent(Opera opera, Date date) {
         Event event = new Event().setDate(date).setOpera(opera);
         return eventRepo.add(event);
     }
 
     @Override
-    public boolean removeEvent(Opera opera, Date date) {
+    @Notifiable
+    public Boolean removeEvent(Opera opera, Date date) {
         Event event = new Event().setDate(date).setOpera(opera);
         return eventRepo.remove(event);
     }

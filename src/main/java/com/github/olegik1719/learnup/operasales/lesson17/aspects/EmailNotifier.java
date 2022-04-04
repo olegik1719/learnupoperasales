@@ -1,10 +1,17 @@
 package com.github.olegik1719.learnup.operasales.lesson17.aspects;
 
+import com.github.olegik1719.learnup.operasales.lesson17.model.Opera;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @Aspect
@@ -16,8 +23,13 @@ public class EmailNotifier {
      */
 
     @Pointcut("execution(public * com.github.olegik1719.learnup.operasales.lesson17.services.SalesService.buyTicket(..))")
-    public void ticketBuyNotifier() {}
+    public void ticketBuyNotifier() {
+    }
 
+
+    @Pointcut("@annotation(com.github.olegik1719.learnup.operasales.lesson17.annotations.Notifiable)")
+    public void anyNotifiable() {
+    }
 
     @Around("ticketBuyNotifier()")
     public Integer aroundBuyTicket(ProceedingJoinPoint point) {
@@ -34,7 +46,27 @@ public class EmailNotifier {
         }
     }
 
-    private void sendMail(String msg){
+    @After("anyNotifiable()")
+    public void afterNotifiable(JoinPoint point) {
+        if (point.getSignature().getName() == "modifyOpera") {
+            Object[] args = point.getArgs();
+            sendMail("Была изменена опера:\n" +
+                    "Название: " + args[0] + "\n" +
+                    "Автор: " + args[1]);
+        } else if(point.getSignature().getName() == "addEvent")  {
+            Object[] args = point.getArgs();
+            sendMail("Было добавлено мероприятие:\n" +
+                    "Название: " + ((Opera) args[0]).getName() + "\n" +
+                    "Автор: " + ((Opera) args[0]).getAuthor()+ "\n" +
+                    "Дата: " + args[1]);
+        }else{
+            sendMail("Была вызван метод:\n" +
+                    point.getSignature() + "\n" +
+                    "С параметрами: " + Arrays.stream(point.getArgs()).map(Objects::toString).collect(Collectors.joining(";")));
+        }
+    }
+
+    private void sendMail(String msg) {
         System.out.println("Отправлено письмо: " + msg);
     }
 }

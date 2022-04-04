@@ -15,13 +15,13 @@ import java.util.Date;
 public interface SalesService {
     boolean addOpera(String name, String author, String description, Opera.Category category, int capacity);
 
-    boolean modifyOpera(String oldName, String oldAuthor, String newName, String newAuthor, String newDescription, Opera.Category newCategory, int capacity);
+    Boolean modifyOpera(String oldName, String oldAuthor, String newName, String newAuthor, String newDescription, Opera.Category newCategory, int capacity);
 
     boolean removeOpera(String name, String author);
 
-    boolean addEvent(Opera opera, Date date);
+    Boolean addEvent(Opera opera, Date date);
 
-    boolean removeEvent(Opera opera, Date date);
+    Boolean removeEvent(Opera opera, Date date);
 
     Integer buyTicket(Opera opera, Date date);
 
