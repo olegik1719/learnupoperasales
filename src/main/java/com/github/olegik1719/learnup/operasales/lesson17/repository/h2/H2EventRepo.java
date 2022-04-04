@@ -5,9 +5,11 @@ import com.github.olegik1719.learnup.operasales.lesson17.repository.EventRepo;
 import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.entity.EventEntity;
 import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.entity.OperaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.persistence.LockModeType;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
@@ -21,4 +23,7 @@ public interface H2EventRepo extends JpaRepository<EventEntity, Long> {
     @Query("from event where eventDate = :date")
     Collection<EventEntity> findEntityByDate(@Param(value = "date") Date dateEvent);
 
+    @Lock(LockModeType.OPTIMISTIC)
+    @Query("from event b where b.id = :id")
+    EventEntity getForUpdate(Long id);
 }
