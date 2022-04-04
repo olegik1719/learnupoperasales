@@ -1,6 +1,7 @@
 package com.github.olegik1719.learnup.operasales.lesson17.repository.h2.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class EventEntity {
 
     @OneToMany(mappedBy = "event")
     @ToString.Exclude
+    @JsonIgnore
     private Collection<TicketEntity> tickets;
 
 }

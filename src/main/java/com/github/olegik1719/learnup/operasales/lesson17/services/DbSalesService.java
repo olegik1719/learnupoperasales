@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DbSalesService {
@@ -79,6 +81,7 @@ public class DbSalesService {
         return eventRepo.saveAndFlush(event).getId() != null;
     }
 
+
     @Notifiable
     public Boolean removeEvent(OperaEntity opera, Date date) {
         Optional<EventEntity> eventSearch = eventRepo.findEntityByNameAuthorDate(opera.getName(), opera.getAuthor(), date);
@@ -125,4 +128,11 @@ public class DbSalesService {
         return true;
     }
 
+    public List<OperaEntity> getAllOpera(){
+        return operaRepo.findAll().stream().collect(Collectors.toList());
+    }
+
+    public OperaEntity getOpera(String name, String author){
+        return operaRepo.findEntityByNameAuthor(name, author);
+    }
 }
