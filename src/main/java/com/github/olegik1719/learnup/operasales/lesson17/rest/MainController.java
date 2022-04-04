@@ -31,7 +31,7 @@ public class MainController {
         }
     }
 
-    @PostMapping("/addopera")
+    @PostMapping("/admin/addopera")
     public ResponseEntity<OperaEntity> addOpera(@RequestBody Opera opera) {
         try {
             if (service.addOpera(opera.getName(), opera.getAuthor(), opera.getDescription(), opera.getCategory(), opera.getFullCapacity())) {
