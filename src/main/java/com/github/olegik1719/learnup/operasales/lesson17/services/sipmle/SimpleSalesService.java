@@ -9,11 +9,9 @@ import com.github.olegik1719.learnup.operasales.lesson17.repository.OperaRepo;
 import com.github.olegik1719.learnup.operasales.lesson17.repository.TicketRepo;
 import com.github.olegik1719.learnup.operasales.lesson17.services.SalesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-@Service
 public class SimpleSalesService implements SalesService {
     private OperaRepo operaRepo;
     private EventRepo eventRepo;
@@ -71,7 +69,7 @@ public class SimpleSalesService implements SalesService {
 
     @Override
     public Integer buyTicket(Opera opera, Date date) {
-        Event event = eventRepo.getEvent(opera,date);
+        Event event = eventRepo.getEvent(opera, date);
         return ticketRepo.buyTicket(event).getId();
     }
 

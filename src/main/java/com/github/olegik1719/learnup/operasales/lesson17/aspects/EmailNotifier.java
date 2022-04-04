@@ -1,6 +1,6 @@
 package com.github.olegik1719.learnup.operasales.lesson17.aspects;
 
-import com.github.olegik1719.learnup.operasales.lesson17.model.Opera;
+import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.entity.OperaEntity;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -22,7 +22,7 @@ public class EmailNotifier {
      * 3) Перенос мероприятия
      */
 
-    @Pointcut("execution(public * com.github.olegik1719.learnup.operasales.lesson17.services.SalesService.buyTicket(..))")
+    @Pointcut("execution(public * com.github.olegik1719.learnup.operasales.lesson17.services.DbSalesService.buyTicket(..))")
     public void ticketBuyNotifier() {
     }
 
@@ -32,12 +32,12 @@ public class EmailNotifier {
     }
 
     @Around("ticketBuyNotifier()")
-    public Integer aroundBuyTicket(ProceedingJoinPoint point) {
+    public Long aroundBuyTicket(ProceedingJoinPoint point) {
         String methodName = point.getSignature().getName() + "()";
         sendMail("Готовимся к выполнению метода " + methodName);
 
         try {
-            Integer idTicket = (Integer) point.proceed();
+            Long idTicket = (Long) point.proceed();
             sendMail("Продан билет с номером " + idTicket);
             return idTicket;
         } catch (Throwable throwable) {
@@ -53,13 +53,13 @@ public class EmailNotifier {
             sendMail("Была изменена опера:\n" +
                     "Название: " + args[0] + "\n" +
                     "Автор: " + args[1]);
-        } else if(point.getSignature().getName() == "addEvent")  {
+        } else if (point.getSignature().getName() == "addEvent") {
             Object[] args = point.getArgs();
             sendMail("Было добавлено мероприятие:\n" +
-                    "Название: " + ((Opera) args[0]).getName() + "\n" +
-                    "Автор: " + ((Opera) args[0]).getAuthor()+ "\n" +
+                    "Название: " + ((OperaEntity) args[0]).getName() + "\n" +
+                    "Автор: " + ((OperaEntity) args[0]).getAuthor() + "\n" +
                     "Дата: " + args[1]);
-        }else{
+        } else {
             sendMail("Была вызван метод:\n" +
                     point.getSignature() + "\n" +
                     "С параметрами: " + Arrays.stream(point.getArgs()).map(Objects::toString).collect(Collectors.joining(";")));

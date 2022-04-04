@@ -1,0 +1,114 @@
+package com.github.olegik1719.learnup.operasales.lesson17.services;
+
+import com.github.olegik1719.learnup.operasales.lesson17.annotations.Notifiable;
+import com.github.olegik1719.learnup.operasales.lesson17.model.Opera;
+import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.H2EventRepo;
+import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.H2OperaRepo;
+import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.H2TicketRepo;
+import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.entity.EventEntity;
+import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.entity.OperaEntity;
+import com.github.olegik1719.learnup.operasales.lesson17.repository.h2.entity.TicketEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.Optional;
+
+@Service
+public class DbSalesService {
+    H2OperaRepo operaRepo;
+    H2EventRepo eventRepo;
+    H2TicketRepo ticketRepo;
+
+    @Autowired
+    public DbSalesService(H2OperaRepo operaRepo, H2EventRepo eventRepo, H2TicketRepo ticketRepo) {
+        this.ticketRepo = ticketRepo;
+        this.operaRepo = operaRepo;
+        this.eventRepo = eventRepo;
+    }
+
+    public boolean addOpera(String name, String author, String description, Opera.Category category, int capacity) {
+        OperaEntity operaEntity = operaRepo.findEntityByNameAuthor(name, author);
+        if (operaEntity != null) {
+            return false;
+        } else {
+            operaEntity = new OperaEntity().setAuthor(author).setName(name).setDescription(description).setCategory(category.ordinal()).setFullCapacity(capacity);
+            OperaEntity saved = operaRepo.saveAndFlush(operaEntity);
+            return saved.getId() != null;
+        }
+    }
+
+    @Notifiable
+    public Boolean modifyOpera(String oldName, String oldAuthor, String newName, String newAuthor, String newDescription, Opera.Category newCategory, int capacity) {
+        OperaEntity oldOpera = operaRepo.findEntityByNameAuthor(oldName, oldAuthor);
+        if (oldOpera == null) {
+            return false;
+        }
+        OperaEntity newOpera = oldOpera
+                .setAuthor(newAuthor == null ? oldOpera.getAuthor() : newAuthor)
+                .setName(newName == null ? oldOpera.getName() : newName)
+                .setDescription(newDescription == null ? oldOpera.getDescription() : newDescription)
+                .setCategory(newCategory == null ? oldOpera.getCategory() : newCategory.ordinal())
+                .setFullCapacity(capacity <= 0 ? oldOpera.getFullCapacity() : capacity);
+
+        return operaRepo.saveAndFlush(newOpera).getId() != null;
+    }
+
+    public boolean removeOpera(String name, String author) {
+        OperaEntity opera = operaRepo.findEntityByNameAuthor(name, author);
+        operaRepo.delete(opera);
+        operaRepo.flush();
+        return true;
+    }
+
+    @Notifiable
+    public Boolean addEvent(OperaEntity opera, Date date) {
+        Optional<EventEntity> eventSearch = eventRepo.findEntityByNameAuthorDate(opera.getName(), opera.getAuthor(), date);
+        if (eventSearch.isPresent()) {
+            return false;
+        }
+        EventEntity event = new EventEntity().setEventDate(date).setIdOpera(opera);
+        return eventRepo.saveAndFlush(event).getId() != null;
+    }
+
+    @Notifiable
+    public Boolean removeEvent(OperaEntity opera, Date date) {
+        Optional<EventEntity> eventSearch = eventRepo.findEntityByNameAuthorDate(opera.getName(), opera.getAuthor(), date);
+        if (eventSearch.isEmpty()) {
+            return false;
+        }
+        eventRepo.delete(eventSearch.get());
+        return true;
+    }
+
+
+    public Long buyTicket(OperaEntity opera, Date date) {
+        Optional <EventEntity> event = eventRepo.findEntityByNameAuthorDate(opera.getName(), opera.getAuthor(), date);
+        if (event.isEmpty()){
+            throw new IllegalArgumentException("Такого мероприятия нет");
+        }
+        EventEntity eventEntity = event.get();
+        if (eventEntity.getIdOpera().getFullCapacity() > eventEntity.getCountSold()) {
+            eventEntity.setCountSold(eventEntity.getCountSold() + 1);
+            TicketEntity ticket = new TicketEntity().setEvent(eventEntity);
+            TicketEntity savedTicket = ticketRepo.saveAndFlush(ticket);
+            eventRepo.saveAndFlush(eventEntity);
+            return savedTicket.getId();
+        }
+        throw new IllegalArgumentException("Билетов на мероприятие больше нет");
+    }
+
+
+    public boolean refundTicket(long id) {
+        Optional<TicketEntity> optionalTicket = ticketRepo.findById(id);
+        if (optionalTicket.isEmpty()) {
+            throw new IllegalArgumentException("Такого билета не существует");
+        }
+        EventEntity event = optionalTicket.get().getEvent();
+        event.setCountSold(event.getCountSold() - 1);
+        ticketRepo.delete(optionalTicket.get());
+        eventRepo.saveAndFlush(event);
+        return true;
+    }
+
+}
